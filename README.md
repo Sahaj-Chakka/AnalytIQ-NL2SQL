@@ -38,6 +38,8 @@ All 7 datasets are grounded in real campus food-service operations (Compass Grou
 | `orders.csv` | ~3,400 | E-commerce orders by category, channel, customer segment, status |
 | `subscriptions.csv` | ~923 | SaaS lifecycle events: new, upgrade, downgrade, churn, reactivation with MRR |
 
+> **Note:** Raw CSVs are git-ignored. Run `python data/generate_data.py` once after cloning to generate them locally into `data/raw/`.
+
 ### Academic Calendar Dimensions
 
 The `academic_calendar` table is the backbone of AnalytIQ's demand intelligence. Every sales, inventory, and forecast row can be joined to it to understand *why* demand shifted:
@@ -100,7 +102,7 @@ The `academic_calendar` table is the backbone of AnalytIQ's demand intelligence.
 
 ```bash
 git clone https://github.com/Sahaj-Chakka/AnalytIQ-NL2SQL.git
-cd AnalytIQ
+cd AnalytIQ-NL2SQL
 pip install -r requirements.txt
 ```
 
@@ -117,21 +119,20 @@ cp .env.example .env
 python data/generate_data.py
 ```
 
-This generates all 7 CSVs into `data/raw/`. Takes ~10 seconds.
-The raw data is git-ignored — run this once after every fresh clone.
+This creates all 7 CSVs in `data/raw/`. Takes ~10 seconds. Run this once after every fresh clone.
 
-### 4. Start the Backend
+### 4. Start the API Backend
 
 ```bash
-uvicorn backend.main:app --reload
+uvicorn app.main:app --reload
 ```
 
 API available at `http://localhost:8000`. Swagger docs at `http://localhost:8000/docs`.
 
-### 5. Start the Frontend
+### 5. Start the Streamlit UI
 
 ```bash
-streamlit run frontend/app.py
+streamlit run app/app.py
 ```
 
 Open `http://localhost:8501` in your browser.
@@ -170,41 +171,50 @@ Open `http://localhost:8501` in your browser.
 ## 📁 Project Structure
 
 ```
-AnalytIQ/
+AnalytIQ-NL2SQL/
 │
-├── data/                          # Generated CSV datasets (git-ignored)
-│   ├── academic_calendar.csv      # 366 rows — the demand context backbone
-│   ├── sales_transactions.csv     # ~57K rows — outlet × SKU × day sales
-│   ├── inventory_levels.csv       # ~11K rows — daily inventory health
-│   ├── forecast_vs_actual.csv     # ~11K rows — demand forecast accuracy
-│   ├── supplier_orders.csv        # ~1.1K rows — procurement & delivery
-│   ├── orders.csv                 # ~3.4K rows — e-commerce transactions
-│   └── subscriptions.csv          # ~923 rows — SaaS lifecycle events
+├── app/                           # 🖥  UI Layer — visuals and API only
+│   ├── app.py                     # Streamlit chat UI + Plotly charts
+│   └── main.py                    # FastAPI REST API (POST /query, GET /schema …)
 │
-├── backend/
-│   ├── main.py                    # FastAPI app — all REST endpoints
+├── core/                          # 🧠 Brain Layer — all LLM & RAG logic
+│   ├── __init__.py
+│   ├── rag_engine.py              # ChromaDB vector store + schema retrieval
 │   ├── sql_generator.py           # LangChain NL→SQL→NL pipeline
-│   ├── rag_engine.py              # ChromaDB vector store + retrieval
-│   ├── db_loader.py               # DuckDB database + query executor
 │   └── schema_registry.py        # Table schemas + semantic descriptions
 │
-├── frontend/
-│   └── app.py                     # Streamlit chat UI + Plotly charts
+├── data/                          # 💾 Data Layer — generation, loading, raw files
+│   ├── generate_data.py           # Synthetic dataset generator (run once)
+│   ├── db_loader.py               # DuckDB loader + query executor
+│   └── raw/                       # Generated CSVs (git-ignored)
+│       ├── academic_calendar.csv  # 366 rows — demand context backbone
+│       ├── sales_transactions.csv # ~57K rows — outlet × SKU × day sales
+│       ├── inventory_levels.csv   # ~11K rows — daily inventory health
+│       ├── forecast_vs_actual.csv # ~11K rows — demand forecast accuracy
+│       ├── supplier_orders.csv    # ~1.1K rows — procurement & delivery
+│       ├── orders.csv             # ~3.4K rows — e-commerce transactions
+│       └── subscriptions.csv      # ~923 rows — SaaS lifecycle events
 │
-├── scripts/
-│   └── generate_data.py           # Dataset generator (run once)
-│
-├── notebooks/
-│   └── 01_data_exploration.ipynb  # EDA across all 7 datasets
-│
-├── tests/
+├── tests/                         # ✅ Quality Layer
+│   ├── __init__.py
 │   └── test_pipeline.py           # 14 pytest tests (DB + schema registry)
 │
+├── conftest.py                    # pytest path config (auto-used)
 ├── .env.example                   # Environment variable template
 ├── .gitignore
 ├── requirements.txt
+├── LICENSE
 └── README.md
 ```
+
+### Why This Structure
+
+| Layer | Folder | Responsibility |
+|---|---|---|
+| UI | `app/` | Buttons, layout, charts, API endpoints — no business logic |
+| Brain | `core/` | All LLM, RAG, and SQL generation |
+| Data | `data/` | CSV generation, DuckDB loading, raw files |
+| Quality | `tests/` | Isolated tests that don't need the UI running |
 
 ---
 
@@ -231,7 +241,7 @@ OPENAI_API_KEY=sk-...          # Uses gpt-4o (fallback)
 
 ### Switching to Pinecone
 
-To use Pinecone instead of ChromaDB, update `backend/rag_engine.py`:
+To use Pinecone instead of ChromaDB, update `core/rag_engine.py`:
 
 ```python
 import pinecone
@@ -274,7 +284,7 @@ PINECONE_INDEX=analytiq-schemas
 ## 👤 Author
 
 **Sahaj Chakka** — Data Analyst  
-[GitHub](https://github.com/Sahaj-Chakka) · [AnalytIQ Repo](https://github.com/Sahaj-Chakka/AnalytIQ-NL2SQL)
+[GitHub](https://github.com/Sahaj-Chakka) · [AnalytIQ-NL2SQL](https://github.com/Sahaj-Chakka/AnalytIQ-NL2SQL)
 
 ---
 
