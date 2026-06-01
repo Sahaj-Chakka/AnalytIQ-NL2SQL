@@ -1,0 +1,29 @@
+# ── Core ─────────────────────────────────────────────────────────────────────
+pandas>=2.2.0
+numpy>=1.26.0
+duckdb>=0.10.0
+
+# ── LangChain ─────────────────────────────────────────────────────────────────
+langchain>=0.2.0
+langchain-core>=0.2.0
+langchain-anthropic>=0.1.15
+langchain-openai>=0.1.6
+
+# ── LLM APIs ─────────────────────────────────────────────────────────────────
+anthropic>=0.25.0
+openai>=1.30.0
+
+# ── Vector Store ─────────────────────────────────────────────────────────────
+chromadb>=0.5.0
+sentence-transformers>=2.7.0    # local embeddings fallback (no API key needed)
+
+# ── Backend ───────────────────────────────────────────────────────────────────
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+pydantic>=2.7.0
+python-dotenv>=1.0.0
+
+# ── Frontend ─────────────────────────────────────────────────────────────────
+streamlit>=1.35.0
+plotly>=5.22.0
+requests>=2.32.0
