@@ -99,7 +99,7 @@ The `academic_calendar` table is the backbone of AnalytIQ's demand intelligence.
 ### 1. Clone & Install
 
 ```bash
-git clone https://github.com/Sahaj-Chakka/AnalytIQ.git
+git clone https://github.com/Sahaj-Chakka/AnalytIQ-NL2SQL.git
 cd AnalytIQ
 pip install -r requirements.txt
 ```
@@ -114,10 +114,11 @@ cp .env.example .env
 ### 3. Generate Datasets
 
 ```bash
-python scripts/generate_data.py
+python data/generate_data.py
 ```
 
-This creates all 7 CSVs in `/data/`. Takes ~10 seconds.
+This generates all 7 CSVs into `data/raw/`. Takes ~10 seconds.
+The raw data is git-ignored — run this once after every fresh clone.
 
 ### 4. Start the Backend
 
@@ -273,7 +274,7 @@ PINECONE_INDEX=analytiq-schemas
 ## 👤 Author
 
 **Sahaj Chakka** — Data Analyst  
-[GitHub](https://github.com/Sahaj-Chakka) · [AnalytIQ Repo](https://github.com/Sahaj-Chakka/AnalytIQ)
+[GitHub](https://github.com/Sahaj-Chakka) · [AnalytIQ Repo](https://github.com/Sahaj-Chakka/AnalytIQ-NL2SQL)
 
 ---
 
